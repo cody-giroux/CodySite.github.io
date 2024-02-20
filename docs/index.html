@@ -4,74 +4,150 @@
     <title>My Webpage</title>
     <style>
         /* CSS styles go here */
+        .center-table {
+            margin: 0 auto;
+        }
+        td {
+            padding: 10px; /* Add padding to increase spacing */
+        }
     </style>
 </head>
 <body>
     <header>
         <!-- Banner of your choosing -->
-            <img src="codygram-high-resolution-logo.png" alt="Banner"> style=" width: 50%; height: 50px;"
-        </header>
+        <img src="codygram-high-resolution-logo.png" alt="Banner" style=" width: 100%; height: 250px;">
+    </header>
 
     <main>
         <!-- Embedding a Thunkable web app -->
         <iframe src="https://thunkable.site/w/HOC2lnvPmJbAJae5XRhvl" style="width: 100%; height: 800px;"></iframe>
 
-        <!-- Table to display JSON data from Firebase Realtime Database -->
-        <table id="data-table">
-            <thead>
-                <tr>
-                    <th>Column 1</th>
-                    <th>Column 2</th>
-                    <!-- Add more columns as needed -->
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Table rows will be dynamically populated with JSON data -->
-            </tbody>
-        </table>
-    </main>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+        <script>
+            // Initialize Firebase
+            var firebaseConfig = {
+                apiKey: "AIzaSyDC-mr0eBOGzBsxXVrEnNUr3uo039jTNcI",
+                authDomain: "profile-app-a1fde.firebaseapp.com",
+                databaseURL: "https://profile-app-a1fde-default-rtdb.firebaseio.com",
+                projectId: "profile-app-a1fde",
+                storageBucket: "profile-app-a1fde.appspot.com",
+                messagingSenderId: "633320278660",
+                appId: "1:633320278660:web:74e6ea8ebe7d10735a10d1",
+                measurementId: "G-3XP205XD5D"
+            };
+            firebase.initializeApp(firebaseConfig);
 
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <script>
-        // Initialize Firebase
-        var firebaseConfig = {
-            apiKey: "AIzaSyDC-mr0eBOGzBsxXVrEnNUr3uo039jTNcI",
-            authDomain: "profile-app-a1fde.firebaseapp.com",
-            databaseURL: "https://profile-app-a1fde-default-rtdb.firebaseio.com",
-            projectId: "profile-app-a1fde",
-            storageBucket: "profile-app-a1fde.appspot.com",
-            messagingSenderId: "633320278660",
-            appId: "1:633320278660:web:74e6ea8ebe7d10735a10d1",
-            measurementId: "G-3XP205XD5D"
-        };
-        firebase.initializeApp(firebaseConfig);
+            // Get a reference to the database
+            var database = firebase.database();
 
-        // Get a reference to the database
-        var database = firebase.database();
+            // Retrieve the data from the database
+            database.ref().once('value').then(function(snapshot) {
+                // Convert the snapshot to JSON
+                var jsonData = JSON.stringify(snapshot.val(), null, 2);
 
-        // Function to insert data into the table
-        function insertData(data) {
-            var tableRef = document.getElementById("data-table").getElementsByTagName('tbody')[0];
-            var newRow = tableRef.insertRow();
+                // Parse the JSON data
+                var parsedData = JSON.parse(jsonData);
 
-            // Insert data into the table cells
-            var cell1 = newRow.insertCell(0);
-            var cell2 = newRow.insertCell(1);
-            // Add more cells as needed
+                // Get the first three children
+                var firstChild = parsedData[Object.keys(parsedData)[0]];
+                var secondChild = parsedData[Object.keys(parsedData)[1]];
+                var thirdChild = parsedData[Object.keys(parsedData)[2]];
 
-            cell1.innerHTML = data.column1;
-            cell2.innerHTML = data.column2;
-            // Set values for additional cells
-        }
+                // Create a table element
+                var tableElement = document.createElement('table');
+                tableElement.classList.add('center-table'); // Add the CSS class to center the table
 
-        // Loop through each user ID in the database
-        database.ref('users').once('value', function(snapshot) {
-            snapshot.forEach(function(childSnapshot) {
-                var childData = childSnapshot.val();
-                insertData(childData);
+                // Create table headers
+                var headerRow = document.createElement('tr');
+                var nameHeader = document.createElement('th');
+                nameHeader.textContent = 'Name';
+                var imageHeader = document.createElement('th');
+                imageHeader.textContent = 'Image';
+                var hobbyHeader = document.createElement('th');
+                hobbyHeader.textContent = 'Hobby';
+                var birthdayHeader = document.createElement('th');
+                birthdayHeader.textContent = 'Birthday';
+                var taglineHeader = document.createElement('th');
+                taglineHeader.textContent = 'Tagline';
+
+                // Append headers to the header row
+                headerRow.appendChild(nameHeader);
+                headerRow.appendChild(imageHeader);
+                headerRow.appendChild(hobbyHeader);
+                headerRow.appendChild(birthdayHeader);
+                headerRow.appendChild(taglineHeader);
+
+                // Append the header row to the table
+                tableElement.appendChild(headerRow);
+
+                // Create table rows for each child
+                var firstRow = document.createElement('tr');
+                var secondRow = document.createElement('tr');
+                var thirdRow = document.createElement('tr');
+
+                // Create table cells for each child
+                var firstNameCell = document.createElement('td');
+                firstNameCell.textContent = firstChild.name;
+                var firstImageCell = document.createElement('td');
+                firstImageCell.innerHTML = '<img src="' + firstChild.image + '" alt="User Image" style="width: 100px; height: 100px;">';
+                var firstHobbyCell = document.createElement('td');
+                firstHobbyCell.textContent = firstChild.hobby;
+                var firstBirthdayCell = document.createElement('td');
+                firstBirthdayCell.textContent = firstChild.birthday;
+                var firstTaglineCell = document.createElement('td');
+                firstTaglineCell.textContent = firstChild.tagline;
+
+                var secondNameCell = document.createElement('td');
+                secondNameCell.textContent = secondChild.name;
+                var secondImageCell = document.createElement('td');
+                secondImageCell.innerHTML = '<img src="' + secondChild.image + '" alt="User Image" style="width: 100px; height: 100px;">';
+                var secondHobbyCell = document.createElement('td');
+                secondHobbyCell.textContent = secondChild.hobby;
+                var secondBirthdayCell = document.createElement('td');
+                secondBirthdayCell.textContent = secondChild.birthday;
+                var secondTaglineCell = document.createElement('td');
+                secondTaglineCell.textContent = secondChild.tagline;
+
+                var thirdNameCell = document.createElement('td');
+                thirdNameCell.textContent = thirdChild.name;
+                var thirdImageCell = document.createElement('td');
+                thirdImageCell.innerHTML = '<img src="' + thirdChild.image + '" alt="User Image" style="width: 100px; height: 100px;">';
+                var thirdHobbyCell = document.createElement('td');
+                thirdHobbyCell.textContent = thirdChild.hobby;
+                var thirdBirthdayCell = document.createElement('td');
+                thirdBirthdayCell.textContent = thirdChild.birthday;
+                var thirdTaglineCell = document.createElement('td');
+                thirdTaglineCell.textContent = thirdChild.tagline;
+
+                // Append cells to the rows
+                firstRow.appendChild(firstNameCell);
+                firstRow.appendChild(firstImageCell);
+                firstRow.appendChild(firstHobbyCell);
+                firstRow.appendChild(firstBirthdayCell);
+                firstRow.appendChild(firstTaglineCell);
+
+                secondRow.appendChild(secondNameCell);
+                secondRow.appendChild(secondImageCell);
+                secondRow.appendChild(secondHobbyCell);
+                secondRow.appendChild(secondBirthdayCell);
+                secondRow.appendChild(secondTaglineCell);
+
+                thirdRow.appendChild(thirdNameCell);
+                thirdRow.appendChild(thirdImageCell);
+                thirdRow.appendChild(thirdHobbyCell);
+                thirdRow.appendChild(thirdBirthdayCell);
+                thirdRow.appendChild(thirdTaglineCell);
+
+                // Append rows to the table
+                tableElement.appendChild(firstRow);
+                tableElement.appendChild(secondRow);
+                tableElement.appendChild(thirdRow);
+
+                // Append the table to the body
+                document.body.appendChild(tableElement);
             });
-        });
-    </script>
+        </script>
+    </main>
 </body>
 </html>
